@@ -16,8 +16,9 @@ def parse_shot(action: dict, game_id: str) -> ShotEvent | None:
     return ShotEvent(
         game_id=game_id,
         action_number=action["actionNumber"],
+        person_id=action.get("personId", 0),
         player=action.get("playerNameI", "Unknown"),
-        team_id=action.get("teamId"),
+        team_id=action.get("teamId", 0),
         team=action.get("teamTricode", ""),
         made=made,
         x=action["x"],

@@ -4,6 +4,7 @@ from dataclasses import dataclass
 class ShotEvent:
     game_id: str
     action_number: int
+    person_id: int
     player: str          # playerNameI e.g. "J. Tatum"
     team_id: int
     team: str            # teamTricode e.g. "BOS"
