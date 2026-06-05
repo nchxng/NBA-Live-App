@@ -9,10 +9,13 @@ import Link from "next/link";
 
 export default function GamePage({
   params,
+  searchParams,
 }: {
   params: Promise<{ gameId: string }>;
+  searchParams: Promise<{ replay?: string }>;
 }) {
   const { gameId } = use(params);
+  const { replay } = use(searchParams);
   const {
     shots,
     players,
@@ -20,7 +23,7 @@ export default function GamePage({
     incomingShot,
     activeShotPlayerId,
     connectionStatus,
-  } = useGameSocket(gameId);
+  } = useGameSocket(gameId, replay === "1");
 
   return (
     <main className="min-h-screen bg-gray-950 text-white p-4 flex flex-col items-center">

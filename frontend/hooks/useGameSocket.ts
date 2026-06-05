@@ -17,7 +17,7 @@ export interface GameSocketState {
   connectionStatus: ConnectionStatus;
 }
 
-export function useGameSocket(gameId: string): GameSocketState {
+export function useGameSocket(gameId: string, replay = false): GameSocketState {
   const [shots, setShots] = useState<ShotEvent[]>([]);
   const [players, setPlayers] = useState<PlayerState[]>([]);
   const [gameState, setGameState] = useState<GameState | null>(null);
@@ -38,7 +38,8 @@ export function useGameSocket(gameId: string): GameSocketState {
     function connect() {
       if (cancelled) return;
       setConnectionStatus("connecting");
-      ws = new WebSocket(`${WS_BASE}/ws/${gameId}`);
+      const path = replay ? `${WS_BASE}/replay/${gameId}` : `${WS_BASE}/ws/${gameId}`;
+      ws = new WebSocket(path);
 
       ws.onopen = () => {
         reconnectCount.current = 0;
@@ -102,7 +103,7 @@ export function useGameSocket(gameId: string): GameSocketState {
       if (reconnectTimer.current) clearTimeout(reconnectTimer.current);
       ws?.close();
     };
-  }, [gameId]); // re-runs only if gameId changes
+  }, [gameId, replay]);
 
   return {
     shots,
