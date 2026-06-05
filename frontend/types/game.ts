@@ -8,11 +8,13 @@ export interface ShotEvent {
   team: string;           // "BOS"
   team_id: number;
   made: boolean;
-  x: number;              // NBA API half-court x (0–500)
-  y: number;              // NBA API half-court y (0–470)
+  x: number;              // 0–100, % of court length (94ft), full-court positioned
+  y: number;              // 0–100, % of court width (50ft)
   period: number;
   clock: string;          // "PT08M14.00S"
   description: string;
+  score_home: string;
+  score_away: string;
 }
 
 export interface PlayerState {

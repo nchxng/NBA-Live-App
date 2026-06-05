@@ -15,17 +15,16 @@ import { useAnimationLayer } from "./useAnimationLayer";
 interface Props {
   shots: ShotEvent[];
   incomingShot: ShotEvent | null;
-  homeTeamId: number;
 }
 
-export default function CourtCanvas({ shots, incomingShot, homeTeamId }: Props) {
+export default function CourtCanvas({ shots, incomingShot }: Props) {
   const courtRef = useRef<HTMLCanvasElement>(null);
   const shotsRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<HTMLCanvasElement>(null);
 
   useCourtLayer(courtRef);
-  useShotLayer({ canvasRef: shotsRef, shots, homeTeamId });
-  useAnimationLayer({ canvasRef: animRef, incomingShot, homeTeamId });
+  useShotLayer({ canvasRef: shotsRef, shots });
+  useAnimationLayer({ canvasRef: animRef, incomingShot });
 
   const style: React.CSSProperties = {
     position: "absolute",

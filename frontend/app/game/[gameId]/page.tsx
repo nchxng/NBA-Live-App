@@ -38,11 +38,7 @@ export default function GamePage({
 
         {/* Court */}
         <div className="w-full overflow-x-auto mb-4">
-          <CourtCanvas
-            shots={shots}
-            incomingShot={incomingShot}
-            homeTeamId={gameState?.home_team_id ?? 0}
-          />
+          <CourtCanvas shots={shots} incomingShot={incomingShot} />
         </div>
 
         {/* Roster */}

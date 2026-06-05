@@ -9,11 +9,13 @@ class ShotEvent:
     team_id: int
     team: str            # teamTricode e.g. "BOS"
     made: bool
-    x: float
-    y: float
+    x: float             # 0–100, percentage of full court length (94ft)
+    y: float             # 0–100, percentage of full court width (50ft)
     period: int
     clock: str           # "PT11M58.00S"
     description: str
+    score_home: str      # score at moment of shot, for scoreboard updates
+    score_away: str
 
 @dataclass
 class PlayerState:

@@ -6,18 +6,17 @@
 
 import { RefObject, useEffect } from "react";
 import { ShotEvent } from "@/types/game";
-import { mapShot, HOME_BASKET, AWAY_BASKET } from "@/lib/coordinateMapper";
+import { mapShot, targetBasket } from "@/lib/coordinateMapper";
 
 interface Props {
   canvasRef: RefObject<HTMLCanvasElement | null>;
   incomingShot: ShotEvent | null;
-  homeTeamId: number;
 }
 
 const DURATION_MS = 650;
 const ARC_HEIGHT = 80; // how high the ball peaks above the straight-line path
 
-export function useAnimationLayer({ canvasRef, incomingShot, homeTeamId }: Props): void {
+export function useAnimationLayer({ canvasRef, incomingShot }: Props): void {
   useEffect(() => {
     if (!incomingShot) return;
 
@@ -26,9 +25,8 @@ export function useAnimationLayer({ canvasRef, incomingShot, homeTeamId }: Props
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const isHome = incomingShot.team_id === homeTeamId;
-    const start = mapShot(incomingShot.x, incomingShot.y, isHome);
-    const end = isHome ? HOME_BASKET : AWAY_BASKET;
+    const start = mapShot(incomingShot.x, incomingShot.y);
+    const end = targetBasket(incomingShot.x);
 
     const startTime = performance.now();
     let rafId: number;

@@ -1,38 +1,31 @@
-// NBA API coordinate system (half-court, normalized per-team):
-//   x ∈ [0, 500]  — sideline to sideline (50 feet × 10 units/foot)
-//   y ∈ [0, 470]  — baseline to half-court (47 feet × 10 units/foot)
-//   basket sits at approximately (250, 52.5)
+// NBA live API coordinate system (full-court, verified against shotDistance field):
+//   x: 0–100, percentage of court LENGTH (94 feet), left baseline → right baseline
+//   y: 0–100, percentage of court WIDTH  (50 feet), one sideline → other sideline
 //
-// Our canvas is 940 × 500 pixels — exactly proportional to a real NBA court:
-//   canvas x ∈ [0, 940]  — left baseline to right baseline
-//   canvas y ∈ [0, 500]  — north sideline to south sideline
+// Canvas is 940×500 px — 1 px per 0.1 foot, exactly proportional to a real NBA court.
 //
-// Home team attacks the LEFT basket (canvas x ≈ 52.5).
-// Away team attacks the RIGHT basket (canvas x ≈ 887.5).
+// No team-based flipping needed — coordinates are already full-court positioned.
+// Shots naturally cluster near the basket each team is attacking.
 //
-// Transformation:
-//   home:  cx = y_api,           cy = 500 - x_api
-//   away:  cx = 940 - y_api,     cy = 500 - x_api
-//
-// Verification — basket at API (250, 52.5):
-//   home → cx=52.5, cy=250  ✓
-//   away → cx=887.5, cy=250 ✓
+// Basket positions (5.25ft from each baseline, centered on width):
+//   Left basket:  x_api ≈ 5.585,  y_api = 50  → canvas (52.5, 250)
+//   Right basket: x_api ≈ 94.415, y_api = 50  → canvas (887.5, 250)
 
 export const CANVAS_WIDTH = 940;
 export const CANVAS_HEIGHT = 500;
 
-// Basket positions in canvas space (used for ball animation target)
-export const HOME_BASKET = { cx: 52.5, cy: 250 };
+export const HOME_BASKET = { cx: 52.5,  cy: 250 };
 export const AWAY_BASKET = { cx: 887.5, cy: 250 };
 
-export function mapShot(
-  x: number,
-  y: number,
-  isHomeTeam: boolean
-): { cx: number; cy: number } {
-  if (isHomeTeam) {
-    return { cx: y, cy: CANVAS_HEIGHT - x };
-  } else {
-    return { cx: CANVAS_WIDTH - y, cy: CANVAS_HEIGHT - x };
-  }
+export function mapShot(x: number, y: number): { cx: number; cy: number } {
+  return {
+    cx: (x / 100) * CANVAS_WIDTH,
+    cy: (y / 100) * CANVAS_HEIGHT,
+  };
+}
+
+// Returns which basket a shot was aimed at, based on which side of court it came from.
+// Used by the animation layer to pick the correct target.
+export function targetBasket(x: number): { cx: number; cy: number } {
+  return x < 50 ? HOME_BASKET : AWAY_BASKET;
 }

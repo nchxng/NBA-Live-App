@@ -3,15 +3,15 @@ from __future__ import annotations
 from backend.models import ShotEvent
 
 def parse_shot(action: dict, game_id: str) -> ShotEvent | None:
-    # only care about field goal attempts
     if action.get("isFieldGoal") != 1:
         return None
 
-    # skip if no coordinates
     if action.get("x") is None or action.get("y") is None:
         return None
 
-    made = "made" in action.get("description", "").lower()
+    # Use the shotResult field — "Made" or "Missed" — rather than parsing
+    # the description string, which never contains the word "made".
+    made = action.get("shotResult") == "Made"
 
     return ShotEvent(
         game_id=game_id,
@@ -26,4 +26,6 @@ def parse_shot(action: dict, game_id: str) -> ShotEvent | None:
         period=action["period"],
         clock=action["clock"],
         description=action.get("description", ""),
+        score_home=str(action.get("scoreHome", "0")),
+        score_away=str(action.get("scoreAway", "0")),
     )

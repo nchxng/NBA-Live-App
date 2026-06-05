@@ -6,15 +6,14 @@
 
 import { RefObject, useEffect, useRef } from "react";
 import { ShotEvent } from "@/types/game";
-import { mapShot, CANVAS_HEIGHT, CANVAS_WIDTH } from "@/lib/coordinateMapper";
+import { mapShot } from "@/lib/coordinateMapper";
 
 interface Props {
   canvasRef: RefObject<HTMLCanvasElement | null>;
   shots: ShotEvent[];
-  homeTeamId: number;
 }
 
-export function useShotLayer({ canvasRef, shots, homeTeamId }: Props): void {
+export function useShotLayer({ canvasRef, shots }: Props): void {
   // Track how many shots we've already drawn so we only paint new ones.
   const drawnCount = useRef(0);
 
@@ -29,8 +28,7 @@ export function useShotLayer({ canvasRef, shots, homeTeamId }: Props): void {
     if (newShots.length === 0) return;
 
     for (const shot of newShots) {
-      const isHome = shot.team_id === homeTeamId;
-      const { cx, cy } = mapShot(shot.x, shot.y, isHome);
+      const { cx, cy } = mapShot(shot.x, shot.y);
       paintShot(ctx, cx, cy, shot.made);
     }
 

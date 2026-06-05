@@ -9,7 +9,7 @@ from dataclasses import asdict
 
 from backend.broadcaster import manager
 from backend.config import CORS_ORIGINS
-from backend.models import GameSummary
+from backend.models import GameState, GameSummary
 from backend.nba_client import get_scoreboard_games, get_plays, get_boxscore
 from backend.poller import get_initial_state, poll_game, _extract_game_state, _extract_players
 from backend.shot_parser import parse_shot
@@ -123,12 +123,24 @@ async def replay_endpoint(ws: WebSocket, game_id: str) -> None:
         logger.info(f"Replaying {len(shots)} shots for game {game_id}")
 
         # Send each shot as a shot_update, one at a time, with a delay.
+        # Use the score/period/clock embedded in the shot itself so the
+        # scoreboard updates in sync with each basket.
         for shot in shots:
             try:
+                live_state = GameState(
+                    period=shot.period,
+                    clock=shot.clock,
+                    score_home=shot.score_home,
+                    score_away=shot.score_away,
+                    home_team=game_state.home_team,
+                    away_team=game_state.away_team,
+                    home_team_id=game_state.home_team_id,
+                    away_team_id=game_state.away_team_id,
+                )
                 await ws.send_text(json.dumps({
                     "type": "shot_update",
                     "shots": [asdict(shot)],
-                    "game_state": asdict(game_state),
+                    "game_state": asdict(live_state),
                 }))
                 # 800ms between shots — fast enough to test, slow enough to see animations.
                 await asyncio.sleep(0.8)
